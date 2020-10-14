@@ -24,16 +24,19 @@ func main(){
 	if snumber > len(interfaces_slice) {
 		log.Fatal("Not in range!")
 	}
-	//
+	//Clear dns servers
+	cc := exec.Command("wmic","nicconfig","where","(IPEnabled=TRUE)","call","SetDNSServerSearchOrder","()")
+	cc.Output()
+	//Set dns servers
 	for _,i := range dns.GetDns() {
 		network := `"` + interfaces_slice[snumber-1] +  `"`
 		cmd := exec.Command("netsh","interface","ip", "add","dns",network,i,"INDEX=2")
-		out,err := cmd.Output()
+		_,err := cmd.Output()
 		if err != nil {
 			fmt.Println(err)
+			time.Sleep(60 * time.Second)
 		}
-		fmt.Println(string(out))
 	}
-	fmt.Println("Done!")
-	time.Sleep(60)
+	fmt.Println("\n\nDone!")
+	time.Sleep(60 * time.Second)
 }
